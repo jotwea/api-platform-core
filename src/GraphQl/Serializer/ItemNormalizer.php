@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace ApiPlatform\GraphQl\Serializer;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Property\Factory\PropertyMetadataFactoryInterface;
@@ -110,6 +111,14 @@ final class ItemNormalizer extends BaseItemNormalizer
      */
     protected function normalizeCollectionOfRelations(ApiProperty $propertyMetadata, iterable $attributeValue, string $resourceClass, ?string $format, array $context): array
     {
+        if ('item_query' === $context['graphql_operation_name'] && $this->resourceMetadataCollectionFactory) {
+            // check for nested collection
+            $operation = $this->resourceMetadataCollectionFactory->create($resourceClass)->getOperation('collection_query');
+            if ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider()) {
+                return [...$attributeValue];
+            }
+        }
+
         // to-many are handled directly by the GraphQL resolver
         return [];
     }

@@ -19,6 +19,7 @@ use ApiPlatform\GraphQl\Resolver\Stage\SecurityPostDenormalizeStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SecurityStageInterface;
 use ApiPlatform\GraphQl\Resolver\Stage\SerializeStageInterface;
 use ApiPlatform\Metadata\GraphQl\Operation;
+use ApiPlatform\Metadata\GraphQl\Query;
 use ApiPlatform\Metadata\Util\CloneTrait;
 use GraphQL\Type\Definition\ResolveInfo;
 use Psr\Container\ContainerInterface;
@@ -46,7 +47,9 @@ final class CollectionResolverFactory implements ResolverFactoryInterface
                 return null;
             }
 
-            if (is_a($resourceClass, \BackedEnum::class, true) && $source && \array_key_exists($info->fieldName, $source)) {
+            if ((is_a($resourceClass, \BackedEnum::class, true)
+                    || ($operation instanceof Query && $operation->getNested() && !$operation->getResolver() && !$operation->getProvider()))
+                && $source && \array_key_exists($info->fieldName, $source)) {
                 return $source[$info->fieldName];
             }
 
