@@ -17,6 +17,9 @@ use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Tests\Fixtures\TestBundle\Document\Dummy as DummyDocument;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Dummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\DummyDtoInputOutput;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6041\NumericValidated;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6146\Issue6146Child;
+use ApiPlatform\Tests\Fixtures\TestBundle\Entity\Issue6146\Issue6146Parent;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\JsonSchemaContextDummy;
 use ApiPlatform\Tests\Fixtures\TestBundle\Entity\User;
 use ApiPlatform\Tests\Fixtures\TestBundle\Model\ResourceInterface;
@@ -125,6 +128,31 @@ JSON;
         $this->assertMatchesResourceCollectionJsonSchema(ResourceInterface::class);
     }
 
+    public function testAssertMatchesResourceCollectionJsonSchemaKeepSerializationContext(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+
+        $parent = new Issue6146Parent();
+        $manager->persist($parent);
+
+        $child = new Issue6146Child();
+        $child->setParent($parent);
+        $parent->addChild($child);
+        $manager->persist($child);
+
+        $manager->persist($child);
+        $manager->flush();
+
+        self::createClient()->request('GET', "issue-6146-parents/{$parent->getId()}");
+        $this->assertMatchesResourceItemJsonSchema(Issue6146Parent::class);
+
+        self::createClient()->request('GET', '/issue-6146-parents');
+        $this->assertMatchesResourceCollectionJsonSchema(Issue6146Parent::class);
+    }
+
     public function testAssertMatchesResourceItemJsonSchema(): void
     {
         self::createClient()->request('GET', '/resource_interfaces/some-id');
@@ -178,6 +206,33 @@ JSON;
 
         self::createClient()->request('GET', '/users-with-groups');
         $this->assertMatchesResourceCollectionJsonSchema(User::class, null, 'jsonld', ['groups' => ['api-test-case-group']]);
+    }
+
+    public function testAssertMatchesResourceItemAndCollectionJsonSchemaOutputWithRangeAssertions(): void
+    {
+        $this->recreateSchema();
+
+        /** @var EntityManagerInterface $manager */
+        $manager = static::getContainer()->get('doctrine')->getManager();
+        $numericValidated = new NumericValidated();
+        $numericValidated->range = 5;
+        $numericValidated->greaterThanMe = 11;
+        $numericValidated->greaterThanOrEqualToMe = 10.99;
+        $numericValidated->lessThanMe = 11;
+        $numericValidated->lessThanOrEqualToMe = 99.33;
+        $numericValidated->positive = 1;
+        $numericValidated->positiveOrZero = 0;
+        $numericValidated->negative = -1;
+        $numericValidated->negativeOrZero = 0;
+
+        $manager->persist($numericValidated);
+        $manager->flush();
+
+        self::createClient()->request('GET', "/numeric-validated/{$numericValidated->getId()}");
+        $this->assertMatchesResourceItemJsonSchema(NumericValidated::class);
+
+        self::createClient()->request('GET', '/numeric-validated');
+        $this->assertMatchesResourceCollectionJsonSchema(NumericValidated::class);
     }
 
     // Next tests have been imported from dms/phpunit-arraysubset-asserts, because the original constraint has been deprecated.

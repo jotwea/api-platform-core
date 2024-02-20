@@ -67,11 +67,11 @@ class RespondProcessorTest extends TestCase
         $iriConverter = $this->prophesize(IriConverterInterface::class);
         $iriConverter
             ->getIriFromResource(Argument::cetera())
-            ->will(static function (array $args): ?string {
+            ->will(static function (array $args): string {
                 return ($args[2] ?? null)?->getUriTemplate() ?? '/default';
             });
 
-        /** @var ProcessorInterface<Response> $respondProcessor */
+        /** @var ProcessorInterface<string, Response> $respondProcessor */
         $respondProcessor = new RespondProcessor($iriConverter->reveal(), $resourceClassResolver->reveal(), $operationMetadataFactory->reveal());
 
         $response = $respondProcessor->process('content', $canonicalUriTemplateRedirectingOperation, context: [
@@ -103,7 +103,7 @@ class RespondProcessorTest extends TestCase
     {
         $operation = new Get();
 
-        /** @var ProcessorInterface<Response> $respondProcessor */
+        /** @var ProcessorInterface<string, Response> $respondProcessor */
         $respondProcessor = new RespondProcessor();
         $req = new Request();
         $req->attributes->set('exception', new TooManyRequestsHttpException(32));

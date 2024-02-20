@@ -98,7 +98,6 @@ Feature: Documentation support
     And the "playMode" property for the OpenAPI class "VideoGame" should be equal to:
     """
     {
-      "owl:maxCardinality": 1,
       "type": "string",
       "format": "iri-reference",
       "example": "https://example.com/"
@@ -310,7 +309,6 @@ Feature: Documentation support
     And the "resourceRelated" property for the OpenAPI class "Resource" should be equal to:
     """
     {
-      "owl:maxCardinality": 1,
       "readOnly": true,
       "anyOf": [
         {
@@ -389,7 +387,47 @@ Feature: Documentation support
     And the "data" property for the OpenAPI class "WrappedResponseEntity.CustomOutputEntityWrapperDto-read" should be equal to:
     """
     {
-      "owl:maxCardinality": 1,
       "$ref": "#\/components\/schemas\/WrappedResponseEntity-read"
+    }
+    """
+
+  Scenario: Retrieve the OpenAPI documentation with 3.0 specification
+    Given I send a "GET" request to "/docs.jsonopenapi?spec_version=3.0.0"
+    Then the response status code should be 200
+    And the response should be in JSON
+    And the JSON node "openapi" should be equal to "3.0.0"
+    And the JSON node "components.schemas.DummyBoolean" should be equal to:
+    """
+    {
+      "type": "object",
+      "description": "",
+      "deprecated": false,
+      "properties": {
+        "id": {
+          "readOnly": true,
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "isDummyBoolean": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dummyBoolean": {
+          "readOnly": true,
+          "type": "boolean"
+        }
+      }
     }
     """
