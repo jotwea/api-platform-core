@@ -1,5 +1,24 @@
 # Changelog
 
+## v3.2.16
+
+### Bug fixes
+
+* [56744dcfa](https://github.com/api-platform/core/commit/56744dcfa07f79ca58926cb199356e849ddb3a93) fix(serializer): fix union types on collection denormalization (#6192)
+* [d8e2d0c5e](https://github.com/api-platform/core/commit/d8e2d0c5e9b48c15d60a734086b0102b6ecf95c8) fix(doctrine): doctrine/orm:^3.0 support (#6193)
+* [f891f16d5](https://github.com/api-platform/core/commit/f891f16d50b665f25e4699291526161e16ce0fa7) fix(doctrine): isAssociationInverseSide before getMappedBy (#6197)
+
+## v3.2.15
+
+### Bug fixes
+
+* [09aacf98a](https://github.com/api-platform/core/commit/09aacf98a2e4d0ffa00fbefa59cb2b31f35fbb54) fix(symfony): revert breaking change on attributes extractor (#6170)
+* [4138cb7c0](https://github.com/api-platform/core/commit/4138cb7c031b38731162d99b3d43754251fc5913) fix(openapi): resource name parameter description (#6178)
+* [5e4b6312a](https://github.com/api-platform/core/commit/5e4b6312a057ba4d1f45c395c7a215dc393acd80) fix(jsonschema): multiple type support (draft4) (#6171)
+* [8535f9def](https://github.com/api-platform/core/commit/8535f9def6fbd2baff9cedc79c34103940eb4fca) fix(doctrine): read parent class properties on PUT (#6176)
+* [a188c9473](https://github.com/api-platform/core/commit/a188c947396e0400ba6e1aadaa262d2e785fd941) fix(symfony): autoconfigure legacy alias fixes #6177 (#6181)
+* [e7b442149](https://github.com/api-platform/core/commit/e7b4421496b58f7c3db414d11dd357a8dc759323) fix(validator): stop considering properties marked with NotBlank(allowNull=true) as required (#6184)
+
 ## v3.2.14
 
 ### Bug fixes
